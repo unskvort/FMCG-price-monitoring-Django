@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+
+
+{% block title %}
+{{ cur_category.name }}
+{% endblock title %}
+
+{% block sidebar %}
+{% include 'inc/sidebar.html' %}
+{% endblock sidebar %}
+
+
+{% block content %}
+{% for product in products %}
+<div class="card text-center">
+    <div class="card">
+        <div class="card-header">
+            Категория: {{ product.category }}
+        </div>
+        <div class="card-body">
+            <div class="'media">
+                <div class="'media-body">
+                    <h5 class="card-title">{{ product.name }}</h5>
+                    <img src='{{ product.image.url }}' alt=''>
+                    <h4 class="card-text">{{ product.price }} ₽</h4>
+                    <a href="{{ product.get_absolute_url }}" class="btn btn-primary">История цен</a>
+                </div>
+            </div>
+
+        </div>
+        <div class="card-footer text-muted">
+            Обновлено: {{ product.updated_at|date:'d-m-Y H:i' }}
+        </div>
+    </div>
+</div>
+<br>
+{% endfor %}
+{% endblock content %}

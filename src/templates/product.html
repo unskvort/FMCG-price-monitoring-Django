@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+
+
+{% block title %}
+{{ product_item.name }}
+{% endblock title %}
+
+{% block sidebar %}
+{% include 'inc/sidebar.html' %}
+{% endblock sidebar %}
+
+{% block content %}
+<div class="card text-center">
+    <div class="card">
+        <div class="card-header">
+            Категория: {{ product_item.category }}
+        </div>
+        <div class="card-body">
+            <div class="'media">
+                <div class="'media-body">
+                    <h5 class="card-title">{{ product_item.name }}</h5>
+                    <img src='{{ product_item.image.url }}' alt=''>
+                    <h4 class="card-text">{{ product_item.price }} ₽</h4>
+                </div>
+            </div>
+
+        </div>
+        <div class="card-footer text-muted">
+            Обновлено: {{ product_item.updated_at|date:'d-m-Y H:i' }}
+        </div>
+    </div>
+</div>
+<canvas id="myChart" width="70" height="17"></canvas>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    const ctx = document.getElementById('myChart').getContext('2d');
+    const myChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: [{% for item in labels %}"{{ item }}",{% endfor %}],
+    datasets: [{
+        label: "Цена",
+        data: [{% for item in values %}{{ item }}, {% endfor %}],
+        backgroundColor: 'rgba(13, 109, 253, 0.2)',
+            borderColor: 'rgba(13, 109, 253, 1)',
+                borderWidth: 1
+        }]
+    },
+    options: {
+        scales: {
+            y: {
+                beginAtZero: true
+            }
+        }
+    }
+});
+</script>
+{% endblock content %}
