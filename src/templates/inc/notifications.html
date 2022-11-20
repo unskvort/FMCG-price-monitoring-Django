@@ -1,0 +1,34 @@
+<body>
+    <div class="row justify-content-center ">
+        {% if messages %}
+        {% for message in messages %}
+        {% if message.tags == "error" %}
+        <div class="'alert alert-block alert-danger">
+            <h6 class="alert-heading">{{ message }}</h6>
+        </div>
+        {% else %}
+        <div class="'alert alert-block alert-{{ message.tags }}">
+            <h6 class="alert-heading">{{ message }}</h6>
+        </div>
+        {% endif %}
+        {% endfor %}
+        {% endif %}
+        {% if form.non_field_errors %}
+        <div class="alert alert-block alert-danger">
+            {% if form_error_title %}<h6 class="alert-heading">{{ form_error_title }}</h6>{% endif %}
+            <ul class="m-0">
+                {{ form.non_field_errors|unordered_list }}
+            </ul>
+        </div>
+        {% endif %}
+        {% for f in form %}
+        {% if f.errors %}
+        <div class="alert alert-block alert-danger">
+            <h6 class="alert-heading">{{ f.errors }}</h6>
+        </div>
+        {% endif %}
+        {% endfor %}
+    </div>
+</body>
+
+</html>

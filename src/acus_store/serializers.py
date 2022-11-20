@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from store.models import Product, Category, PriceRecord
+from acus_store.models import Product, Category, PriceRecord
 
 
 class CategorySerializer(serializers.ModelSerializer):

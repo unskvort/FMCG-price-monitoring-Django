@@ -24,10 +24,10 @@ app.autodiscover_tasks()
 # RUN command: celery -A config worker --beat -l info
 app.conf.beat_schedule = {
     "update-store-everyday": {
-        "task": "store.tasks.update_store",
+        "task": "acus_store.tasks.update_store",
         "schedule": settings.TASK_RECURRENCE_PERIOD,
         "args": (),
     },
 }
 
-app.conf.timezone = settings.TIME_ZONE
+app.conf.timezone = settings.TIME_ZONE  # type: ignore

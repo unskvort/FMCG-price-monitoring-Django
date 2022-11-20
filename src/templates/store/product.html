@@ -1,0 +1,93 @@
+{% extends "base.html" %}
+
+
+{% block title %}
+{{ product_item.name }}
+{% endblock title %}
+
+{% block sidebar %}
+<div class="container mt-3">
+    <div class="class row">
+        <div class="col-md-3">
+            {% include 'inc/sidebar.html' %}
+        </div>
+        {% endblock sidebar %}
+
+        {% block content %}
+        <div class="col-md-9">
+            <div class="card text-center">
+                <div class="card">
+                    <div class="card-header">
+                        Категория: {{ product_item.category }}
+                    </div>
+                    <div class="card-body">
+                        <div class="'media">
+                            <div class="'media-body">
+                                <h5 class="card-title">{{ product_item.name }}</h5>
+                                <img src='{{ product_item.image.url }}' alt=''>
+                                <h4 class="card-text">{{ product_item.price }} ₽</h4>
+                            </div>
+                        </div>
+                    </div>
+                    <br>
+                    {% if user.is_authenticated and is_favorite == False %}
+                    <form action="{% url 'manager_favorites' %}" method="post">
+                        {% csrf_token %}
+                        <p><input class="form-control" type="hidden" name="id" value="{{ product_item.id }}"></p>
+                        <button class="btn btn-outline-dark" type="submit">
+                            Добавить в избранное
+                        </button>
+                    </form>
+                    {% elif user.is_authenticated and is_favorite == True %}
+                    <form action="{% url 'manager_favorites' %}" method="post">
+                        {% csrf_token %}
+                        <p><input class="form-control" type="hidden" name="id" value="{{ product_item.id }}"></p>
+                        <button class="btn btn-outline-danger" type="submit">
+                            Удалить из избранного
+                        </button>
+                    </form>
+                    {% else %}
+                    <div class="d-grid gap-2 col-6 mx-auto">
+                        <a href="{% url 'login'  %}">
+                            <button class="btn btn-outline-dark" type="button">
+                                Авторизуйтесь и добавьте в избранное
+                            </button>
+                        </a>
+                    </div>
+                    {% endif %}
+                    <br>
+                    <div class="card-footer text-muted">
+                        Обновлено: {{ product_item.updated_at|date:'d.m.Y H:i' }}
+                    </div>
+                </div>
+            </div>
+
+            <canvas id="myChart" width="70" height="17"></canvas>
+            <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+            <script>
+                const ctx = document.getElementById('myChart').getContext('2d');
+                const myChart = new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: [{% for item in labels %}"{{ item }}",{% endfor %}],
+                datasets: [{
+                    label: "Цена",
+                    data: [{% for item in values %}{{ item }}, {% endfor %}],
+                    backgroundColor: 'rgba(112, 128, 144, 0.2)',
+                        borderColor: 'rgba(112, 128, 144, 1)',
+                            borderWidth: 1
+        }]
+    },
+                options: {
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+});
+            </script>
+        </div>
+    </div>
+</div>
+{% endblock content %}

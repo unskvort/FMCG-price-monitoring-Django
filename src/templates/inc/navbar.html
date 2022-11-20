@@ -1,16 +1,45 @@
-<!--Navbar-->
-<nav class="navbar navbar-expand-lg bg-light">
-    <div class="container-fluid">
-        <a class="navbar-brand" href="/">STORE</a>
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavAltMarkup"
-            aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
-            <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
+<!-- Navbar -->
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <!-- Container wrapper -->
+    <div class="container">
+        <!-- Navbar brand -->
+        <a class="navbar-brand" href="/">ACUS</a>
+        <!-- Collapsible wrapper -->
+        <div class="collapse navbar-collapse" id="navbarButtonsExample">
+            <!-- Left links -->
+            
             <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+            {% if user.is_authenticated %}
                 <li class="nav-item">
-                    <a class="nav-link active" aria-current="page" href="/swagger">API Documentation</a>
+                    <a class="nav-link" href="{% url 'favorites' %}">Избранное</a>
                 </li>
+                {% endif %}
+            </ul>
+            
+            <!-- Left links -->
+            <form class="d-flex input-group w-auto" action="{% url 'searching' %}" method="get">
+                <input type="search" class="form-control rounded" name="query" placeholder="Поиск" aria-label="Search"
+                    aria-describedby="search-addon" />
+            </form>
+            <span class="text-dark" id="search-addon"> || </span>
+            {% if user.is_authenticated %}
+            <div class="d-flex align-items-center">
+                <a href="{% url 'logout' %}"><button type="button" class="btn btn-outline-secondary px-3 me-2">
+                        Выйти
+                    </button></a>
+                {% else %}
+                <div class="d-flex align-items-center">
+                    <a href="{% url 'login' %}"><button type="button" class="btn btn-outline-secondary px-3 me-2">
+                            Войти
+                        </button></a>
+                    <a href="{% url 'register' %}"><button type="button" class="btn btn-primary me-3">
+                            Зарегистрироваться
+                        </button></a>
+                    {% endif %}
+                </div>
+            </div>
+            <!-- Collapsible wrapper -->
         </div>
-    </div>
+        <!-- Container wrapper -->
 </nav>
+<!-- Navbar -->

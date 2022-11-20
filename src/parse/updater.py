@@ -4,7 +4,7 @@ from loguru import logger
 from tqdm import tqdm
 
 from parse.download import Downloader
-from store.models import Category, PriceRecord, Product
+from acus_store.models import Category, PriceRecord, Product
 
 
 class Updater:
@@ -15,10 +15,12 @@ class Updater:
     @staticmethod
     def clean_dataframe(df: pd.DataFrame) -> pd.DataFrame:
         df.drop_duplicates(subset=["article"], inplace=True)
+        df = df[df["title"].str.contains("SPAR") == False]  # noqa
         df.reset_index(drop=True, inplace=True)
         df["article"] = df["article"].astype("int64")
         df["price"] = df["price"].apply(lambda x: x.replace(" ", ""))
         df["price"] = df["price"].astype("int64")
+
         return df
 
     def update_store(self) -> pd.DataFrame:

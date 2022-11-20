@@ -7,8 +7,8 @@ from rest_framework import status
 from rest_framework.test import APIClient
 from rest_framework_simplejwt.tokens import RefreshToken
 
+from acus_store.models import Category, PriceRecord, Product
 from parse.download import Downloader
-from store.models import Category, PriceRecord, Product
 
 
 class DjangoViews(TestCase):
@@ -29,6 +29,16 @@ class DjangoViews(TestCase):
         response = self.client.get("/")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
+    def test_search_wrong(self):
+        response = self.client.get("/search/?query=testtest")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertContains(response, "Ничего не найдено")
+
+    def test_search_correct(self):
+        response = self.client.get("/search/?query=test")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertContains(response, "test")
+
     def test_category(self):
         response = self.client.get("/category/1/")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
@@ -39,6 +49,10 @@ class DjangoViews(TestCase):
 
     def test_swagger(self):
         response = self.client.get("/swagger/")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+    def test_redoc(self):
+        response = self.client.get("/redoc/")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
 
@@ -58,15 +72,15 @@ class APIViews(TestCase):
 
     def test_prices(self):
         response = self.with_auth.get("/api/v1/prices/")
-        self.assertEqual(response.status_code, status.HTTP_200_OK)  # type: ignore
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
 
     def test_categories(self):
         response = self.with_auth.get("/api/v1/categories/")
-        self.assertEqual(response.status_code, status.HTTP_200_OK)  # type: ignore
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
 
     def test_products(self):
         response = self.with_auth.get("/api/v1/products/")
-        self.assertEqual(response.status_code, status.HTTP_200_OK)  # type: ignore
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
 
 
 class Parser(TestCase):
