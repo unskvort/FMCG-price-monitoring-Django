@@ -35,7 +35,7 @@ CELERY_BROKER_URL = env("REDIS_URL")
 CELERY_BEAT_SCHEDULER = "django_celery_beat.schedulers.DatabaseScheduler"
 
 # Repeat task "update-store-everyday" -> Everyday 00:00
-TASK_RECURRENCE_PERIOD = crontab(hour=0, minute=0)  # type: ignore
+TASK_RECURRENCE_PERIOD = crontab(hour=20, minute=35)  # type: ignore
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.1/howto/deployment/checklist/
@@ -48,7 +48,6 @@ DEBUG = True
 
 ALLOWED_HOSTS = ["*"]
 
-
 # Application definition
 
 INSTALLED_APPS = [
@@ -58,11 +57,13 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
-    "store.apps.StoreConfig",
+    "acus_store.apps.StoreConfig",
+    "acus_favorites.apps.FavoritesConfig",
+    "acus_auth.apps.AuthConfig",
     "django_celery_beat",
     "django_celery_results",
-    "rest_framework",
     "debug_toolbar",
+    "rest_framework",
     "drf_yasg",
     "rest_framework_simplejwt",
 ]
@@ -100,6 +101,10 @@ TEMPLATES = [
 
 WSGI_APPLICATION = "config.wsgi.application"
 
+# Authentication urls
+LOGIN_URL = "login"
+LOGIN_REDIRECT_URL = "/login"
+HOMEPAGE_REDIRECT_URL = "/"
 
 # Database
 # https://docs.djangoproject.com/en/4.1/ref/settings/#databases

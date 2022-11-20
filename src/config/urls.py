@@ -29,7 +29,7 @@ def trigger_error(request: HttpRequest) -> None:
 
 schema_view = get_schema_view(
     openapi.Info(
-        title="STORE API",
+        title="ACUS API",
         default_version="v1",
     ),
     public=True,
@@ -43,7 +43,9 @@ urlpatterns = [
     path("__debug__/", include("debug_toolbar.urls")),
     path("sentry-debug/", trigger_error),  # type: ignore
     path("admin/", admin.site.urls),
-    path("", include("store.urls")),
+    path("", include("acus_store.urls")),
+    path("", include("acus_auth.urls")),
+    path("", include("acus_favorites.urls")),
 ]
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

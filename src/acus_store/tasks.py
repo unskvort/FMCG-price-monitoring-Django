@@ -1,6 +1,6 @@
 from typing import Literal
 
-from celery import shared_task  # type: ignore
+from celery import shared_task
 
 from parse.updater import Updater
 

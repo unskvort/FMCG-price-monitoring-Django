@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+
+
+{% block title %}
+{{ cur_category.name }}
+{% endblock title %}
+
+{% block sidebar %}
+<div class="container mt-3">
+    <div class="class row">
+        <div class="col-md-3">
+            {% include 'inc/sidebar.html' %}
+        </div>
+        {% endblock sidebar %}
+
+        {% block content %}
+        <div class="col-md-9">
+            <div class="row row-cols-1 row-cols-md-3 g-4">
+                {% for product in products %}
+                <div class="col">
+                    <div class="card h-100">
+                        <div class="card-header">
+                            <div class="text-center">
+                                Категория: {{ product.category }}
+                            </div>
+                        </div>
+                        <a href="{{ product.get_absolute_url }}">
+                            <img src="{{ product.image.url }}" class="card-img-top">
+                        </a>
+                        <div class="card-body">
+                            <h5 class="card-title">{{ product.price }} ₽</h5>
+                            <p class="card-text">{{ product.name }}</p>
+                        </div>
+                        <div class="card-footer text-muted">
+                            <div class="text-center">
+                                Обновлено: {{ product.updated_at|date:'d.m.Y H:i' }}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            <br>
+            {% block paginator %}
+            {% include 'inc/paginator.html' %}
+            {% endblock paginator %}
+        </div>
+    </div>
+</div>
+{% endblock content %}

@@ -3,8 +3,8 @@ from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework.viewsets import ReadOnlyModelViewSet
 
-from store.models import Category, PriceRecord, Product
-from store.serializers import CategorySerializer, PricesSerializer, ProductSerializer
+from acus_store.models import Category, PriceRecord, Product
+from acus_store.serializers import CategorySerializer, PricesSerializer, ProductSerializer
 
 
 class CategoryViewSet(ReadOnlyModelViewSet):

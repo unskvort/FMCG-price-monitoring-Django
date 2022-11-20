@@ -2,7 +2,7 @@ from django.urls import include, path
 from rest_framework import routers
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView, TokenVerifyView
 
-from store import api, views
+from acus_store import api, views
 
 router = routers.SimpleRouter()
 router.register(r"categories", api.CategoryViewSet)
@@ -11,6 +11,7 @@ router.register(r"prices", api.PriceViewSet)
 
 urlpatterns = [
     path("", views.Home.as_view(), name="homepage"),
+    path("search/", views.Searching.as_view(), name="searching"),
     path("category/<int:category_id>/", views.WithinCategory.as_view(), name="category"),
     path("product/<int:product_id>/", views.ViewProduct.as_view(), name="product"),
     path("api/v1/", include(router.urls)),

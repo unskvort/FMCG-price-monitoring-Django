@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from store.models import Category, PriceRecord, Product
+from acus_store.models import Category, PriceRecord, Product
 
 
 @admin.register(Product)

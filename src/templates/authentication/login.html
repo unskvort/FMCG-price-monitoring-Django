@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+
+{% block title %}
+{{ title }}
+{% endblock title %}
+
+{% block content %}
+<div class="container py-5">
+    <h1>Авторизация</h1>
+    <form method="POST">
+        {% csrf_token %}
+        <div class="mb-3">
+            <label class="form-label">{{ form.username.label }}</label>
+            <p><input class="form-control" type="text" name="username" required id="id_username"></p>
+            <label class="form-label">{{ form.password.label }}</label>
+            <p><input class="form-control" type="password" name="password" required id="id_password"></p>
+            <input type="hidden" name="next" value="{{ request.path }}">
+        </div>
+        <button class="btn btn-secondary" type="submit">Войти</button>
+    </form>
+    <p class="text-center">Еще нет аккаунта? <a href="/register">Создайте</a>.</p>
+</div>
+{% endblock %}

@@ -32,14 +32,14 @@ services:
     image: postgres:14
     restart: always
     volumes:
-      - postgres_store:/var/lib/postgresql/data
+      - postgres_acus:/var/lib/postgresql/data
     ports:
       - "5544:5432"
     env_file:
       - ./src/dev.env
 
 volumes:
-  postgres_store:
+  postgres_acus:
     external: True
   redis:
     external: False
