@@ -147,6 +147,7 @@ services:
       - ./src/:/app/
     depends_on:
       - redis
+      - postgres
     env_file:
       - ./src/prod.env
     labels:
@@ -167,7 +168,7 @@ services:
     labels:
       - docker-volume-backup.stop-during-backup=true
     healthcheck:
-      test: ["CMD-SHELL", "sh -c 'pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}'"]
+      test: [ "CMD-SHELL", "pg_isready -d $${POSTGRES_DB} -U $${POSTGRES_USER}"]
       interval: 30s
       timeout: 20s
       retries: 3
