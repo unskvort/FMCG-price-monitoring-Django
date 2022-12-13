@@ -65,6 +65,8 @@ services:
       - 7755:80
     depends_on:
       - django
+      - grafana
+      - minio
     labels:
       - docker-volume-backup.stop-during-backup=true
   
@@ -77,7 +79,7 @@ services:
     ports:
       - 9113:9113
     depends_on:
-      - prometheus
+      - nginx
 
   redis-exporter:
     container_name: redis-exporter
@@ -97,6 +99,8 @@ services:
       - 9187:9187
     env_file:
       - ./src/prod.env
+    depends_on:
+      - postgres
 
   prometheus:
     container_name: prometheus
@@ -163,8 +167,6 @@ services:
       - "5544:5432"
     env_file:
       - ./src/prod.env
-    depends_on:
-        - minio
     labels:
       - docker-volume-backup.stop-during-backup=true
     healthcheck:
