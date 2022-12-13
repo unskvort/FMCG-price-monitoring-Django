@@ -1,0 +1,216 @@
+version: '3.8'
+
+services:
+  redis:
+    container_name: redis
+    image: redis:7.0.5
+    restart: always
+    volumes:
+      - redis:/data
+    ports:
+      - 6379:6379
+    healthcheck:
+      test: ["CMD-SHELL", "redis-cli ping | grep PONG"]
+      interval: 30s
+      timeout: 20s
+      retries: 3
+
+  minio:
+    container_name: minio
+    image: minio/minio:RELEASE.2022-11-26T22-43-32Z
+    command: server --address ":9001" --console-address ":9000" /data
+    restart: always
+    expose:
+        - 9000
+        - 9001
+    env_file:
+      - ./src/prod.env
+    volumes:
+        - minio-storage:/data
+    env_file:
+      - ./src/prod.env
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://minio:9001/minio/health/live"]
+      interval: 30s
+      timeout: 20s
+      retries: 3
+
+  grafana:
+    container_name: grafana
+    image: grafana/grafana:9.3.1
+    restart: always
+    expose:
+      - 3000
+    volumes:
+      - grafana-storage:/var/lib/grafana
+      - ./grafana/provisioning/:/etc/grafana/provisioning
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://grafana:3000/healthz"]
+      interval: 30s
+      timeout: 20s
+      retries: 3
+    labels:
+      - docker-volume-backup.stop-during-backup=true
+
+  nginx:
+    container_name: nginx
+    image: nginx:1.22.1
+    restart: always
+    volumes:
+      - ./nginx/:/etc/nginx/conf.d
+      - nginx-storage:/var/log/nginx/
+      - media_acus:/var/www/app/media
+      - static_acus:/var/www/app/static
+    ports:
+      - 7755:80
+    depends_on:
+      - django
+    labels:
+      - docker-volume-backup.stop-during-backup=true
+  
+  nginx-exporter:
+    container_name: nginx-exporter
+    restart: always
+    image: nginx/nginx-prometheus-exporter:0.11
+    command:
+      - -nginx.scrape-uri=http://nginx:80/stub_status/
+    ports:
+      - 9113:9113
+    depends_on:
+      - prometheus
+
+  redis-exporter:
+    container_name: redis-exporter
+    image: oliver006/redis_exporter:v1.45.0
+    restart: always
+    command: -redis.addr redis://redis:6379
+    ports:
+      - 9121:9121
+    depends_on:
+      - redis
+
+  postgres-exporter:
+    image: prometheuscommunity/postgres-exporter:v0.11.0
+    restart: always
+    container_name: postgres-exporter
+    ports:
+      - 9187:9187
+    env_file:
+      - ./src/prod.env
+
+  prometheus:
+    container_name: prometheus
+    image: prom/prometheus:v2.40.6
+    command: --web.enable-lifecycle  --config.file=/etc/prometheus/prometheus.yml
+    restart: always
+    ports:
+     - 9090:9090
+    volumes:
+      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+      - prometheus-storage:/prometheus
+    env_file:
+      - ./src/prod.env
+    depends_on:
+      - nginx
+    labels:
+      - docker-volume-backup.stop-during-backup=true
+
+  django:
+    container_name: django
+    build: ./src
+    restart: always
+    command: gunicorn config.wsgi:application --bind 0.0.0.0:8000
+    volumes:
+      - media_acus:/app/media/
+      - static_acus:/app/static/
+      - ./src/:/app/
+    expose:
+      - 8000
+    depends_on:
+      - postgres
+    env_file:
+      - ./src/prod.env
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://django:8000/ping"]
+      interval: 30s
+      timeout: 20s
+      retries: 3
+
+  celery:
+    container_name: celery
+    build: ./src
+    restart: always
+    command: celery -A config worker --beat --task-events -l info
+    volumes:
+      - media_acus:/app/media/
+      - static_acus:/app/static/
+      - ./src/:/app/
+    depends_on:
+      - redis
+    env_file:
+      - ./src/prod.env
+    labels:
+      - docker-volume-backup.stop-during-backup=true
+
+  postgres:
+    container_name: postgres
+    image: postgres:14
+    restart: always
+    volumes:
+      - database_acus:/var/lib/postgresql/data
+    ports:
+      - "5544:5432"
+    env_file:
+      - ./src/prod.env
+    depends_on:
+        - minio
+    labels:
+      - docker-volume-backup.stop-during-backup=true
+    healthcheck:
+      test: ["CMD-SHELL", "sh -c 'pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}'"]
+      interval: 30s
+      timeout: 20s
+      retries: 3
+
+  backup:
+    container_name: backup
+    restart: always
+    image: offen/docker-volume-backup:v2
+    env_file:
+      - ./src/prod.env
+    volumes:
+      - media_acus:/backup/media:ro
+      - static_acus:/backup/static:ro
+      - database_acus:/backup/database:ro
+      - grafana-storage:/backup/grafana:ro
+      - prometheus-storage:/backup/prometheus:ro
+      - nginx-storage:/backup/nginx:ro
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    depends_on:
+      - minio
+  
+  minio-manager:
+    container_name: minio-manager
+    image: minio/mc:RELEASE.2022-12-02T23-48-47Z
+    depends_on:
+      - minio
+    env_file:
+      - ./src/prod.env
+    entrypoint: >
+      /bin/sh -c "
+      /usr/bin/mc config host add minio http://minio:9001/ $$MINIO_ROOT_USER $$MINIO_ROOT_PASSWORD;
+      /usr/bin/mc mb minio/backups;
+      /usr/bin/mc anonymous set public minio/backups;
+      exit 0;
+      "
+
+volumes:
+  redis:
+    external: False
+  database_acus:
+  media_acus:
+  static_acus:
+  grafana-storage:
+  minio-storage:
+  prometheus-storage:
+  nginx-storage:

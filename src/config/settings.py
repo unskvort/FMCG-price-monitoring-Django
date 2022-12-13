@@ -11,9 +11,9 @@ https://docs.djangoproject.com/en/4.1/ref/settings/
 """
 import sys
 from datetime import timedelta
+from os import environ
 from pathlib import Path
 
-import environ
 import sentry_sdk
 from celery.schedules import crontab
 from sentry_sdk.integrations.django import DjangoIntegration
@@ -21,35 +21,22 @@ from sentry_sdk.integrations.django import DjangoIntegration
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-# Environment variables
-env = environ.Env()
-environ.Env.read_env(env_file=BASE_DIR / "dev.env/")
-
-# Save Celery task results in Django's database
+# CELERY
 CELERY_RESULT_BACKEND = "django-db"
-
-# This configures Redis as the datastore between Django + Celery
-CELERY_BROKER_URL = env("REDIS_URL")
-
-# This allows you to schedule items in the Django admin.
+CELERY_BROKER_URL = environ.get("REDIS_URL") or "test"
 CELERY_BEAT_SCHEDULER = "django_celery_beat.schedulers.DatabaseScheduler"
+# Everyday 00:00
+TASK_RECURRENCE_PERIOD = crontab(hour=0, minute=0)
 
-# Repeat task "update-store-everyday" -> Everyday 00:00
-TASK_RECURRENCE_PERIOD = crontab(hour=20, minute=35)  # type: ignore
+# SECURITY
+DEBUG = environ.get("DJANGO_DEBUG") or False
+SECRET_KEY = environ.get("SECRET_KEY") or "test"
+CSRF_TRUSTED_ORIGINS = ["http://localhost:8000", "http://localhost:7755"]
 
-# Quick-start development settings - unsuitable for production
-# See https://docs.djangoproject.com/en/4.1/howto/deployment/checklist/
-
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = env("SECRET_KEY")
-
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
-
+# Hosts
 ALLOWED_HOSTS = ["*"]
 
 # Application definition
-
 INSTALLED_APPS = [
     "django.contrib.admin",
     "django.contrib.auth",
@@ -108,25 +95,25 @@ HOMEPAGE_REDIRECT_URL = "/"
 
 # Database
 # https://docs.djangoproject.com/en/4.1/ref/settings/#databases
-
-DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.postgresql_psycopg2",
-        "NAME": env("POSTGRES_DB"),
-        "USER": env("POSTGRES_USER"),
-        "PASSWORD": env("POSTGRES_PASSWORD"),
-        "HOST": env("POSTGRES_IP"),
-        "PORT": env("POSTGRES_PORT"),
-    }
-}
+DATABASES = {"default": {}}  # type: ignore
 
 # For tests
 if "test" in sys.argv or "test_coverage" in sys.argv:  # Covers regular testing and django-coverage
     DATABASES["default"]["ENGINE"] = "django.db.backends.sqlite3"
+else:
+    DATABASES = {
+        "default": {
+            "ENGINE": "django.db.backends.postgresql_psycopg2",
+            "NAME": environ["POSTGRES_DB"],
+            "USER": environ["POSTGRES_USER"],
+            "PASSWORD": environ["POSTGRES_PASSWORD"],
+            "HOST": environ["POSTGRES_IP"],
+            "PORT": environ["POSTGRES_PORT"],
+        }
+    }
 
 # Password validation
 # https://docs.djangoproject.com/en/4.1/ref/settings/#auth-password-validators
-
 AUTH_PASSWORD_VALIDATORS = [
     {
         "NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator",
@@ -145,7 +132,6 @@ AUTH_PASSWORD_VALIDATORS = [
 
 # Internationalization
 # https://docs.djangoproject.com/en/4.1/topics/i18n/
-
 LANGUAGE_CODE = "en-us"
 
 TIME_ZONE = "Europe/Moscow"
@@ -157,18 +143,15 @@ USE_TZ = True
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.1/howto/static-files/
-
-STATIC_URL = "static/"
+STATIC_URL = "/static/"
+STATIC_ROOT = BASE_DIR / "static/"
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.1/ref/settings/#default-auto-field
-
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 # Base url to serve media files
 MEDIA_URL = "/media/"
-
-# Path where media is stored
 MEDIA_ROOT = BASE_DIR / "media/"
 
 # The Debug Toolbar is shown only if your IP address is listed in Django’s
@@ -179,7 +162,7 @@ INTERNAL_IPS = [
 # https://sentry.io/ logging
 if not DEBUG:
     sentry_sdk.init(
-        dsn=env("SENTRY_SDK_DSN"),
+        dsn=environ.get("SENTRY_SDK_DSN") or "https://5@5.ingest.sentry.io/6",
         integrations=[
             DjangoIntegration(),
         ],

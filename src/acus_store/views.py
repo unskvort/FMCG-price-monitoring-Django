@@ -4,11 +4,16 @@ from typing import Any, Type
 from django.core.exceptions import ObjectDoesNotExist
 from django.db.models import Model, Q
 from django.db.models.query import QuerySet
+from django.http import HttpRequest, HttpResponse
 from django.shortcuts import get_object_or_404
 from django.views.generic import DetailView, ListView
 
 from acus_favorites.models import Favorite
 from acus_store.models import Category, Product
+
+
+def ping(request: HttpRequest) -> HttpResponse:
+    return HttpResponse("PONG")
 
 
 class Home(ListView):
@@ -26,7 +31,7 @@ class Home(ListView):
         return queryset
 
 
-class WithinCategory(ListView):
+class CategoryWithin(ListView):
     model: Type[Model] = Product
     template_name: str = "store/category.html"
     context_object_name: str = "products"
@@ -50,7 +55,7 @@ class ViewProduct(DetailView):
     context_object_name: str = "product_item"
 
     def _prepare_chart(self, prices: QuerySet) -> tuple[tuple[Any | int], tuple[Any | int]]:
-        data: Counter = Counter()
+        data: Counter[Any] = Counter()
         for row in prices:
             yymm = row.updated_at.strftime("%d/%m/%Y")
             price = row.price
@@ -77,7 +82,7 @@ class ViewProduct(DetailView):
     def get_context_data(self, **kwargs) -> dict[str, Any]:
         context = super().get_context_data(**kwargs)
         is_favorite = self._is_favorite_user()
-        prices = Product.objects.get(pk=self.kwargs["product_id"]).price_records.all()  # type: ignore
+        prices = Product.objects.get(pk=self.kwargs["product_id"]).price_records.all()
         labels, values = self._prepare_chart(prices)
         context["prices"] = prices
         context["is_favorite"] = is_favorite

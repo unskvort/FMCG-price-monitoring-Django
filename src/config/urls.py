@@ -41,7 +41,7 @@ urlpatterns = [
     re_path(r"^swagger/$", schema_view.with_ui("swagger", cache_timeout=0), name="schema-swagger-ui"),
     re_path(r"^redoc/$", schema_view.with_ui("redoc", cache_timeout=0), name="schema-redoc"),
     path("__debug__/", include("debug_toolbar.urls")),
-    path("sentry-debug/", trigger_error),  # type: ignore
+    path("sentry-debug/", trigger_error),
     path("admin/", admin.site.urls),
     path("", include("acus_store.urls")),
     path("", include("acus_auth.urls")),

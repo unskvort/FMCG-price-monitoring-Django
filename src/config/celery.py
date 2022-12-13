@@ -8,7 +8,7 @@ from django.conf import settings
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "config.settings")
 
 
-app = Celery("config")  # type: ignore
+app = Celery("config")
 
 # Using a string here means the worker don't have to serialize
 # the configuration object to child processes.
@@ -30,4 +30,4 @@ app.conf.beat_schedule = {
     },
 }
 
-app.conf.timezone = settings.TIME_ZONE  # type: ignore
+app.conf.timezone = settings.TIME_ZONE

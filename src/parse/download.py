@@ -41,7 +41,7 @@ class Downloader:
                 continue
         return None
 
-    def categories(self) -> list:
+    def categories(self) -> list[str]:
         categories: list[str] = []
         request = self._download(path="/catalog/")
         if request:
@@ -53,9 +53,9 @@ class Downloader:
 
     def products(self, category: str) -> dict[str, list[str]]:
         request = self._download(path=category, postfix=self.POSTFIX)
-        soup = BeautifulSoup(request, "html.parser")  # type: ignore
+        soup = BeautifulSoup(request, "html.parser")
         dataset: dict[str, list[str]] = {"title": [], "article": [], "image": [], "price": []}
-        category_product = soup.find("meta", attrs={"name": "keywords"}).get("content")  # type: ignore
+        category_product = soup.find("meta", attrs={"name": "keywords"}).get("content")
         products = soup.find_all(class_="catalog-list__item js-list-paging-item col-md-6 col-xl-4")
 
         for product in products:
@@ -65,7 +65,7 @@ class Downloader:
             )
             dataset["image"].append(product.source["data-srcset"])
             dataset["price"].append(product.find(class_="prices__cur js-item-price").text[:-4])
-        dataset["category"] = [category_product] * len(dataset["title"])  # type: ignore
+        dataset["category"] = [category_product] * len(dataset["title"])
         return dataset
 
     def image(self, url: str, name: str) -> ImageFile:

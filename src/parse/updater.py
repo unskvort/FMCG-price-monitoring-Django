@@ -48,7 +48,7 @@ class Updater:
 
             if not product.image:
                 image = self.downloader.image(row.image, row.article)
-                product.image = image  # type: ignore
+                product.image = image
             product.price = row.price
             product.save()
         logger.info(f"Store updated on {len(dataset)} products")

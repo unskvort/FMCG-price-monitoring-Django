@@ -7,6 +7,6 @@ register = template.Library()
 
 
 @register.inclusion_tag("store/list_categories.html")
-def show_categories() -> dict:
+def show_categories() -> dict[str, Category]:
     categories = Category.objects.annotate(cnt=Count("products")).filter(cnt__gt=0)
     return {"categories": categories}
