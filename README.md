@@ -33,9 +33,6 @@ cd FMCG-price-monitoring-Django/ && docker-compose -f docker-compose.dev.yml -d 
 ```
 cd FMCG-price-monitoring-Django/ && docker-compose -f docker-compose.prod.yml up -d --build
 ```
-##### Run collect static
-```
-docker exec django python manage.py collectstatic
 ```
 ##### Links
 [minio: s3.localhost:7755](http://s3.localhost:7755)

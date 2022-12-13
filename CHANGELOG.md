@@ -1,7 +1,7 @@
 ## 0.1.2 / 2022-12-13
 
 * Add production version
-* Add prometheus, grafana for metrics
+* Add prometheus, grafana for monitoring
 * Add nginx for proxy
 * Add backups every month. Old backups are deleted
 * Add setup.cfg
