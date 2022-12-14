@@ -5,7 +5,7 @@
 <p align="center">
   <a href="https://www.python.org/downloads/release/python-3110/"><img src="https://img.shields.io/badge/python-3.11-blue" alt=""></a>
   <a href="https://pypi.org/project/Django/4.1.2/"><img src="https://img.shields.io/badge/django-4.1.2-green" alt=""></a>
-  <a href="https://github.com/unskvort/FMCG-price-monitoring-Django"><img src="https://img.shields.io/badge/version-0.1.2-lightgrey" alt=""></a>
+  <a href="https://github.com/unskvort/FMCG-price-monitoring-Django"><img src="https://img.shields.io/badge/version-0.1.3-lightgrey" alt=""></a>
 </p>
 
 <p align="center">
@@ -31,7 +31,9 @@ cd FMCG-price-monitoring-Django/ && docker-compose -f docker-compose.dev.yml -d 
 ```
 ## Production version
 ```
-cd FMCG-price-monitoring-Django/ && docker-compose -f docker-compose.prod.yml up -d --build
+cd FMCG-price-monitoring-Django/ && docker compose \
+ -f docker-compose.prod.yml \
+ -f docker-compose.override.yml up -d --build
 ```
 
 ##### Links

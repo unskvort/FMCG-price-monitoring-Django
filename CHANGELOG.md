@@ -1,3 +1,9 @@
+## 0.1.3 / 2022-12-14
+
+* Add logging nginx
+* Add docker-compose.override
+* Fix minor bugs
+
 ## 0.1.2 / 2022-12-13
 
 * Add production version

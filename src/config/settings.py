@@ -31,7 +31,7 @@ TASK_RECURRENCE_PERIOD = crontab(hour=0, minute=0)
 # SECURITY
 DEBUG = environ.get("DJANGO_DEBUG") or False
 SECRET_KEY = environ.get("SECRET_KEY") or "test"
-CSRF_TRUSTED_ORIGINS = ["http://localhost:8000", "http://localhost:7755"]
+CSRF_TRUSTED_ORIGINS = [environ.get("CSRF_TRUSTED_ORIGINS") or "http://localhost:80"]
 
 # Hosts
 ALLOWED_HOSTS = ["*"]
