@@ -27,7 +27,7 @@ git clone https://github.com/unskvort/FMCG-price-monitoring-Django.git
 ```
 ## Development version
 ```
-cd FMCG-price-monitoring-Django/ && docker-compose -f docker-compose.dev.yml -d --build
+cd FMCG-price-monitoring-Django/ && docker-compose -f docker-compose.dev.yml up -d --build
 ```
 ## Production version
 ```
